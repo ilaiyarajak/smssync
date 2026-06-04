@@ -32,14 +32,14 @@ jobs:
         run: ./gradlew assembleRelease
 
       - name: Upload debug APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-debug
           path: androidapp/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
 
       - name: Upload release APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: androidapp/app/build/outputs/apk/release/app-release.apk
@@ -47,7 +47,7 @@ jobs:
 
       - name: Upload Build Report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-report
           path: androidapp/app/build/reports/
