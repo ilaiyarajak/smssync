@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.smssync.ui.logs
 
 import androidx.compose.animation.AnimatedVisibility
@@ -20,8 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.smssync.data.db.SmsEntity
 import java.text.SimpleDateFormat
 import java.util.*
-
-@file:OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
 fun LogsScreen(

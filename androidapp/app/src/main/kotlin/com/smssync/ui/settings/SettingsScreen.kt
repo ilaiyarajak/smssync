@@ -1,15 +1,15 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.smssync.ui.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
-@file:OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
 fun SettingsScreen(
@@ -31,7 +31,7 @@ fun SettingsScreen(
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
+                        Icons.Default.ArrowBack,
                         contentDescription = "Back"
                     )
                 }
