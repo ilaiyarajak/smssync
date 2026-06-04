@@ -33,15 +33,15 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: androidapp/app/build/outputs/apk/debug/app-debug.apk
+          name: smssync-debug
+          path: androidapp/app/build/outputs/apk/debug/smssync-debug.apk
           retention-days: 7
 
       - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: androidapp/app/build/outputs/apk/release/app-release.apk
+          name: smssync-release
+          path: androidapp/app/build/outputs/apk/release/smssync-release.apk
           retention-days: 30
 
       - name: Upload Build Report
