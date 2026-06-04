@@ -61,7 +61,11 @@ class LogsViewModel(private val context: Context) : ViewModel() {
             try {
                 val cursor = context.contentResolver.query(
                     Telephony.Sms.CONTENT_URI,
-                    null,
+                    arrayOf(
+                        Telephony.Sms.ADDRESS,
+                        Telephony.Sms.BODY,
+                        Telephony.Sms.DATE
+                    ),
                     null,
                     null,
                     "${Telephony.Sms.DATE} DESC"
@@ -70,23 +74,29 @@ class LogsViewModel(private val context: Context) : ViewModel() {
                 var totalScanned = 0
                 var imported = 0
 
-                cursor?.use {
-                    while (it.moveToNext()) {
-                        totalScanned++
-                        val sender = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.ADDRESS))
-                        val body = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.BODY))
-                        val timestamp = it.getLong(it.getColumnIndexOrThrow(Telephony.Sms.DATE))
+                cursor?.use { c ->
+                    val addressIdx = c.getColumnIndex(Telephony.Sms.ADDRESS)
+                    val bodyIdx = c.getColumnIndex(Telephony.Sms.BODY)
+                    val dateIdx = c.getColumnIndex(Telephony.Sms.DATE)
 
-                        if (!repository.checkIfSmsExists(sender, timestamp)) {
-                            val isBankSms = com.smssync.util.BankSmsFilter.isBankSms(sender, body)
-                            val sms = SmsEntity(
-                                sender = sender,
-                                body = body,
-                                timestamp = timestamp,
-                                isBankSms = isBankSms
-                            )
-                            repository.insertSms(sms)
-                            imported++
+                    if (addressIdx >= 0 && bodyIdx >= 0 && dateIdx >= 0) {
+                        while (c.moveToNext()) {
+                            totalScanned++
+                            val sender = c.getString(addressIdx)
+                            val body = c.getString(bodyIdx)
+                            val timestamp = c.getLong(dateIdx)
+
+                            if (!repository.checkIfSmsExists(sender, timestamp)) {
+                                val isBankSms = com.smssync.util.BankSmsFilter.isBankSms(sender, body)
+                                val sms = SmsEntity(
+                                    sender = sender,
+                                    body = body,
+                                    timestamp = timestamp,
+                                    isBankSms = isBankSms
+                                )
+                                repository.insertSms(sms)
+                                imported++
+                            }
                         }
                     }
                 }
@@ -112,6 +122,7 @@ class LogsViewModel(private val context: Context) : ViewModel() {
                 )
             } catch (e: Exception) {
                 _syncStats.value = SyncStats()
+                e.printStackTrace()
             } finally {
                 _isSyncing.value = false
             }
