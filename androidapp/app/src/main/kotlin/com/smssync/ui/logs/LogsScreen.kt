@@ -21,7 +21,8 @@ import com.smssync.data.db.SmsEntity
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun LogsScreen(
     viewModel: LogsViewModel,
