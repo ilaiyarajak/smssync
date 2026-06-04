@@ -9,6 +9,7 @@ import com.smssync.network.SmsApiService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.content.Context
@@ -56,7 +57,7 @@ class LogsViewModel(private val context: Context) : ViewModel() {
     }
 
     fun masterSync() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _isSyncing.value = true
             try {
                 val cursor = context.contentResolver.query(
@@ -75,29 +76,37 @@ class LogsViewModel(private val context: Context) : ViewModel() {
                 var imported = 0
 
                 cursor?.use { c ->
-                    val addressIdx = c.getColumnIndex(Telephony.Sms.ADDRESS)
-                    val bodyIdx = c.getColumnIndex(Telephony.Sms.BODY)
-                    val dateIdx = c.getColumnIndex(Telephony.Sms.DATE)
+                    try {
+                        val addressIdx = c.getColumnIndex(Telephony.Sms.ADDRESS)
+                        val bodyIdx = c.getColumnIndex(Telephony.Sms.BODY)
+                        val dateIdx = c.getColumnIndex(Telephony.Sms.DATE)
 
-                    if (addressIdx >= 0 && bodyIdx >= 0 && dateIdx >= 0) {
-                        while (c.moveToNext()) {
-                            totalScanned++
-                            val sender = c.getString(addressIdx)
-                            val body = c.getString(bodyIdx)
-                            val timestamp = c.getLong(dateIdx)
+                        if (addressIdx >= 0 && bodyIdx >= 0 && dateIdx >= 0) {
+                            while (c.moveToNext()) {
+                                try {
+                                    totalScanned++
+                                    val sender = c.getString(addressIdx) ?: "Unknown"
+                                    val body = c.getString(bodyIdx) ?: ""
+                                    val timestamp = c.getLong(dateIdx)
 
-                            if (!repository.checkIfSmsExists(sender, timestamp)) {
-                                val isBankSms = com.smssync.util.BankSmsFilter.isBankSms(sender, body)
-                                val sms = SmsEntity(
-                                    sender = sender,
-                                    body = body,
-                                    timestamp = timestamp,
-                                    isBankSms = isBankSms
-                                )
-                                repository.insertSms(sms)
-                                imported++
+                                    if (!repository.checkIfSmsExists(sender, timestamp)) {
+                                        val isBankSms = com.smssync.util.BankSmsFilter.isBankSms(sender, body)
+                                        val sms = SmsEntity(
+                                            sender = sender,
+                                            body = body,
+                                            timestamp = timestamp,
+                                            isBankSms = isBankSms
+                                        )
+                                        repository.insertSms(sms)
+                                        imported++
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
                             }
                         }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 }
 
@@ -106,11 +115,16 @@ class LogsViewModel(private val context: Context) : ViewModel() {
                 var failed = 0
 
                 for (sms in unsyncedBankSms) {
-                    if (repository.syncSms(sms)) {
-                        repository.markAsSynced(sms.id)
-                        synced++
-                    } else {
+                    try {
+                        if (repository.syncSms(sms)) {
+                            repository.markAsSynced(sms.id)
+                            synced++
+                        } else {
+                            failed++
+                        }
+                    } catch (e: Exception) {
                         failed++
+                        e.printStackTrace()
                     }
                 }
 
