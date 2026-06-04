@@ -31,7 +31,7 @@ while [ -h "$PRG" ] ; do
     PRG=`readlink "$PRG"`
 done
 SAVED="`pwd`"
-cd "`dirname \"$PRG\"`/" >/dev/null
+cd "`dirname "$PRG"`/" >/dev/null
 APP_HOME="`pwd -P`"
 cd "$SAVED" >/dev/null
 
@@ -77,25 +77,21 @@ esac
 
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
-
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
     if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
-        # IBM's JDK on AIX uses strange locations for the executables
         JAVACMD="$JAVA_HOME/jre/sh/java"
     else
         JAVACMD="$JAVA_HOME/bin/java"
     fi
     if [ ! -x "$JAVACMD" ] ; then
         die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
-
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
     fi
 else
     JAVACMD="java"
     which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
-
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
 fi
@@ -125,84 +121,30 @@ fi
 if [ "$cygwin" = "true" -o "$msys" = "true" ] ; then
     APP_HOME=`cygpath --path --mixed "$APP_HOME"`
     CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
-
     JAVACMD=`cygpath --unix "$JAVACMD"`
-
-    # We build the pattern for arguments to be converted via cygpath
-    ROOTDIRSRAW=`find -L / -maxdepth 2 -name .gradle -o -name .idea -o -name .git -type d 2>/dev/null`
-    SEP=""
-    for dir in $ROOTDIRSRAW ; do
-        ROOTDIRS="$ROOTDIRS$SEP$dir"
-        SEP="|"
-    done
-    OURCYGPATTERN="(^($ROOTDIRS)$|^$)"
-    CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
-
-    JAVACMD=`cygpath --unix "$JAVACMD"`
-
-    # We build the pattern for arguments to be converted via cygpath
-    ROOTDIRSRAW=`find -L / -maxdepth 2 -name .gradle -o -name .idea -o -name .git -type d 2>/dev/null`
-    SEP=""
-    for dir in $ROOTDIRSRAW ; do
-        ROOTDIRS="$ROOTDIRS$SEP$dir"
-        SEP="|"
-    done
-    OURCYGPATTERN="(^($ROOTDIRS)$|^$)"
-    CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
-
-    JAVACMD=`cygpath --unix "$JAVACMD"`
-
 fi
 
-# Collect all arguments for the java command;
-#   * $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $GRADLE_OPTS can contain fragments of
-#     shell commands and variable substitutions, so put them in double quotes to make
-#     sure that they get re-expanded; and
-#   * put everything else in single quotes, so that the shell interprets those
-#     variables as literals.
+# Collect all arguments for the java command, stacking in reverse order
+i=0
+for arg in "$@" ; do
+    i=`expr $i + 1`
+    eval "args_$i=\$arg"
+done
+case $i in
+    (1) set -- "$args_1" ;;
+    (2) set -- "$args_1" "$args_2" ;;
+    (3) set -- "$args_1" "$args_2" "$args_3" ;;
+    (4) set -- "$args_1" "$args_2" "$args_3" "$args_4" ;;
+    (5) set -- "$args_1" "$args_2" "$args_3" "$args_4" "$args_5" ;;
+    (6) set -- "$args_1" "$args_2" "$args_3" "$args_4" "$args_5" "$args_6" ;;
+    (7) set -- "$args_1" "$args_2" "$args_3" "$args_4" "$args_5" "$args_6" "$args_7" ;;
+    (8) set -- "$args_1" "$args_2" "$args_3" "$args_4" "$args_5" "$args_6" "$args_7" "$args_8" ;;
+    (9) set -- "$args_1" "$args_2" "$args_3" "$args_4" "$args_5" "$args_6" "$args_7" "$args_8" "$args_9" ;;
+esac
 
-set -- \
-        "-Dorg.gradle.appname=$APP_BASE_NAME" \
-        -classpath "$CLASSPATH" \
-        org.gradle.wrapper.GradleWrapperMain \
-        "$@"
-
-# Stop when "xargs" by itself expands to nothing
-if [ -z "$(command -v xargs)" ]; then
-    die "xargs is required but is not available"
+# by default we should be in the correct project dir, but when run from Finder on Mac, the cwd is wrong
+if [ "$(uname)" = "Darwin" ] && [ "$HOME" = "$PWD" ]; then
+    cd "$(dirname "$0")"
 fi
 
-# Use "xargs" to parse quoted args.
-#
-# With -n1 it outputs one arg per line, with -0 and tr '\0' '\n' it
-# canonicalizes line endings and allows for arguments spanning multiple lines.
-#
-positional=()
-IFS=$'\n'
-for arg in $( xargs -n1 <<<"$@" | tr '\r\n' ' \\n' ); do
-    case $arg in #(
-      -*)   false;;
-      *)    true;;
-    esac && positional+=( "$(printf 'x\n%s' "$arg" | tail -n +2 )" )
-done
-
-# Reset the positional parameters, so we can pop off the first element.
-set -- "${positional[@]}"
-
-# Restore IFS
-IFS=$oldIFS
-
-# Now set the args for the wrapper script.
-set --
-while true; do
-    case "$1" in
-      --) shift; break;;
-      -*) false;;
-      *) break;;
-    esac
-    set -- "$@" "$1"
-    shift
-done
-set -- "${@}" "$@"
-
-exec "$JAVACMD" "${JVM_OPTS[@]}" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "${args[@]}"
+exec "$JAVACMD" $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS -Dorg.gradle.appname=$APP_BASE_NAME -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
