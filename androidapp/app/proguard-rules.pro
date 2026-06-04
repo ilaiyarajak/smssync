@@ -1,0 +1,6 @@
+-keepattributes *Annotation*
+-keep class com.google.gson.** { *; }
+-keep class com.squareup.okhttp3.** { *; }
+-keep class retrofit2.** { *; }
+-keep class * extends androidx.room.RoomDatabase
+-keepclassmembers class * extends androidx.room.RoomDatabase { *; }

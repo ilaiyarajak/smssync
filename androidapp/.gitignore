@@ -1,0 +1,44 @@
+# Gradle files
+.gradle
+build/
+gradlew
+gradlew.bat
+gradle/
+
+# Local configuration file
+local.properties
+
+# Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+/captures
+.externalNativeBuild
+.cxx
+
+# Android project files
+.classpath
+.project
+.settings/
+bin/
+gen/
+
+# Output directories
+out/
+
+# Kotlin
+*.kotlin_module
+
+# Editor files
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test outputs
+.test_outputs/
